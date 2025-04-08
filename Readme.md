@@ -16,9 +16,7 @@ note : grpc interface shoud be build before building the spring boot application
 
 [GET]
 http://localhost:8081/api/securities
-
 <br>
-
 [GET]
 http://localhost:8081/api/securities/custodian/1
 

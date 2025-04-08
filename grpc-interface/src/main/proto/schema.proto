@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package com.tedd;
+
+option java_multiple_files = true;
+
+message Custodian{
+  int32 custodianID = 1;
+  string custodianName = 2;
+  string country = 3;
+  repeated Security securities = 4; // List of securities held by this custodian
+  string rating = 5;
+}
+
+enum SecurityType {
+  STOCK = 0;
+  BOND = 1;
+  ETF = 2;
+}
+
+message Security{
+  int32 securityID = 1;
+  int32 custodianID = 2;
+  string securityName = 3;
+  SecurityType type = 4;
+  float price = 5;
+  int32 quantity = 6;
+  string symbol = 7;
+}
+
+// Container message for a list of securities
+message SecuritiesList {
+  repeated Security securities = 1;
+}
+
+service SecurityService{
+  rpc getSecuritiesByCustodian(Custodian) returns (stream Security);
+
+  // Additional methods for handling lists of securities
+  rpc getAllSecurities(Empty) returns (SecuritiesList);
+  rpc addSecurities(SecuritiesList) returns (StatusResponse);
+}
+
+// Empty message for requests that don't need parameters
+message Empty {}
+
+// Response message for operations that return status
+message StatusResponse {
+  bool success = 1;
+  string message = 2;
+}

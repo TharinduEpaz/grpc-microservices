@@ -1,0 +1,7 @@
+server:
+  port: 8081
+grpc:
+  client:
+    grpc-tedd-service:
+      address: static://localhost:9000
+      negotiationType: plaintext

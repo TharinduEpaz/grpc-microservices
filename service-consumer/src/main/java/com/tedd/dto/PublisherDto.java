@@ -11,10 +11,11 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustodianDto {
-    private int custodianId;
-    private String custodianName;
+public class PublisherDto {
+    private int publisherId;
+    private String publisherName;
     private String country;
-    private List<SecurityDto> securities;
+    private List<BookDto> books;
     private String rating;
 }
+

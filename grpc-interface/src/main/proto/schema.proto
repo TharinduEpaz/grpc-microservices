@@ -4,41 +4,44 @@ package com.tedd;
 
 option java_multiple_files = true;
 
-message Custodian{
-  int32 custodianID = 1;
-  string custodianName = 2;
+message Publisher{
+  int32 publisherID = 1;
+  string publisherName = 2;
   string country = 3;
-  repeated Security securities = 4; // List of securities held by this custodian
+  repeated Book books = 4; // List of books published by this publisher
   string rating = 5;
 }
 
-enum SecurityType {
-  STOCK = 0;
-  BOND = 1;
-  ETF = 2;
+enum BookGenre {
+  FICTION = 0;
+  NON_FICTION = 1;
+  SCI_FI = 2;
+  MYSTERY = 3;
+  ROMANCE = 4;
+  FANTASY = 5;
 }
 
-message Security{
-  int32 securityID = 1;
-  int32 custodianID = 2;
-  string securityName = 3;
-  SecurityType type = 4;
+message Book{
+  int32 bookID = 1;
+  int32 publisherID = 2;
+  string bookName = 3;
+  BookGenre genre = 4;
   float price = 5;
-  int32 quantity = 6;
-  string symbol = 7;
+  int32 stock = 6;
+  string isbn = 7;
 }
 
-// Container message for a list of securities
-message SecuritiesList {
-  repeated Security securities = 1;
+// Container message for a list of books
+message BooksList {
+  repeated Book books = 1;
 }
 
-service SecurityService{
-  rpc getSecuritiesByCustodian(Custodian) returns (stream Security);
+service BookService{
+  rpc getBooksByPublisher(Publisher) returns (stream Book);
 
-  // Additional methods for handling lists of securities
-  rpc getAllSecurities(Empty) returns (SecuritiesList);
-  rpc addSecurities(SecuritiesList) returns (StatusResponse);
+  // Additional methods for handling lists of books
+  rpc getAllBooks(Empty) returns (BooksList);
+  rpc addBooks(BooksList) returns (StatusResponse);
 }
 
 // Empty message for requests that don't need parameters

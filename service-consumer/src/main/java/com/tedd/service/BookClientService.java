@@ -2,9 +2,9 @@ package com.tedd.service;
 
 import com.google.protobuf.Descriptors;
 import com.tedd.*;
-import com.tedd.dto.SecurityDto;
-import com.tedd.dto.SecurityTypeDto;
-import com.tedd.dto.mappers.SecurityMapper;
+import com.tedd.dto.BookDto;
+import com.tedd.dto.BookGenreDto;
+import com.tedd.dto.mappers.BookMapper;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -15,61 +15,61 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Client service for interacting with the Securities gRPC service.
- * Provides methods to retrieve securities data from the remote service
+ * Client service for interacting with the Books gRPC service.
+ * Provides methods to retrieve books data from the remote service
  * using both synchronous and asynchronous gRPC communication patterns.
  */
 @Slf4j
 @Service
-public class SecuritiesClientService {
+public class BookClientService {
 
     /**
-     * Synchronous blocking stub for making gRPC calls to the security service.
+     * Synchronous blocking stub for making gRPC calls to the book service.
      * Used for simple request-response patterns.
      */
     @GrpcClient("grpc-tedd-service")
-    SecurityServiceGrpc.SecurityServiceBlockingStub syncClient;
+    BookServiceGrpc.BookServiceBlockingStub syncClient;
 
     /**
-     * Asynchronous non-blocking stub for making gRPC calls to the security service.
+     * Asynchronous non-blocking stub for making gRPC calls to the book service.
      * Used for streaming responses and non-blocking operations.
      */
     @GrpcClient("grpc-tedd-service")
-    SecurityServiceGrpc.SecurityServiceStub asyncClient;
+    BookServiceGrpc.BookServiceStub asyncClient;
 
     /**
-     * Retrieves all securities from the gRPC service.
+     * Retrieves all books from the gRPC service.
      * Uses synchronous blocking call pattern.
      *
-     * @return List of SecurityDto objects containing all securities data
+     * @return List of BookDto objects containing all books data
      */
-    public List<SecurityDto> getAllSecurities() {
+    public List<BookDto> getAllBooks() {
         Empty request = Empty.newBuilder().build();
-        SecuritiesList response = syncClient.getAllSecurities(request);
-        return response.getSecuritiesList().stream().map(SecurityMapper::toDto).toList();
+        BooksList response = syncClient.getAllBooks(request);
+        return response.getBooksList().stream().map(BookMapper::toDto).toList();
     }
 
     /**
-     * Retrieves securities filtered by custodian ID from the gRPC service.
+     * Retrieves books filtered by publisher ID from the gRPC service.
      * Uses asynchronous streaming call pattern with a countdown latch to wait for completion.
      *
-     * @param custodianID The ID of the custodian to filter securities by
-     * @return List of SecurityDto objects matching the custodian ID, or empty list if timeout occurs
+     * @param publisherID The ID of the publisher to filter books by
+     * @return List of BookDto objects matching the publisher ID, or empty list if timeout occurs
      * @throws InterruptedException If the waiting process is interrupted
      */
-    public List<SecurityDto> getSecuritiesByCustodian(int custodianID) throws InterruptedException {
+    public List<BookDto> getBooksByPublisher(int publisherID) throws InterruptedException {
 
         // CountDownLatch is a synchronization aid that allows one or more threads to wait until
         // a set of operations being performed in other threads completes.
         // Here we initialize it with count=1, meaning we'll wait for exactly one countdown event.
         final CountDownLatch countDownLatch = new CountDownLatch(1);
-        Custodian custodianRequest = Custodian.newBuilder().setCustodianID(custodianID).build();
-        List<SecurityDto> response = new ArrayList<>();
+        Publisher publisherRequest = Publisher.newBuilder().setPublisherID(publisherID).build();
+        List<BookDto> response = new ArrayList<>();
 
-        asyncClient.getSecuritiesByCustodian(custodianRequest, new StreamObserver<Security>() {
+        asyncClient.getBooksByPublisher(publisherRequest, new StreamObserver<Book>() {
             @Override
-            public void onNext(Security security) {
-                response.add(SecurityMapper.toDto(security));
+            public void onNext(Book book) {
+                response.add(BookMapper.toDto(book));
             }
 
             @Override
@@ -89,7 +89,8 @@ public class SecuritiesClientService {
         // Wait for the asynchronous operation to complete, with a timeout of 1 minute
         // This prevents the method from hanging indefinitely if the gRPC service doesn't respond
         boolean await = countDownLatch.await(1, TimeUnit.MINUTES);
-        // Return the collected securities if completed within timeout, otherwise return empty list
+        // Return the collected books if completed within timeout, otherwise return empty list
         return await ? response : new ArrayList<>();
     }
 }
+

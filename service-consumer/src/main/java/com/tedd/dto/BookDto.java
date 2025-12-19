@@ -9,12 +9,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SecurityDto {
-    private int securityId;
-    private int custodianId;
-    private String securityName;
-    private SecurityTypeDto type;
+public class BookDto {
+    private int bookId;
+    private int publisherId;
+    private String bookName;
+    private BookGenreDto genre;
     private float price;
-    private int quantity;
-    private String symbol;
+    private int stock;
+    private String isbn;
 }
+
